@@ -7,6 +7,7 @@ output: html_document
 
 ```{r, message = FALSE}
 library(tidyverse)
+library(lubridate)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -64,7 +65,7 @@ accel_data =
     weekend = day,
     weekend = recode(weekend, "Monday" = "FALSE", "Tuesday" = "FALSE", "Wednesday" = "FALSE", "Thursday" = "FALSE", "Friday" = "FALSE", "Saturday" = "TRUE", "Sunday" = "TRUE"),
     weekend = as.logical(weekend)
-  )
+  ) 
 
 head(arrange(accel_data, day_id, week, day, weekend, minute, activity_count))
 ```
@@ -85,5 +86,30 @@ accel_data %>%
 
 The trends are..
 
+
+
 # Problem 3
+
+First, I'll load NY NOAA data from the p8105 library.
+
+```{r}
+library(p8105.datasets)
+data("ny_noaa")
+```
+
+This dataset comes from the National Oceanic and Atmospheric Association (NOAA) National Climatic Data Center. It includes information on all New York State weather stations from January 1, 1981 to December 21, 2010, including the weather station id (id), date of observation, precipitation in tenths of mm (prcp), snowfall in mm (snow), snow depth in mm (snwd), maximum and minimum temperature in degrees C (tmax) (tmin). 
+
+Prior to cleaning, the dataset had `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. Since each station collects only a subset of the variables described, the dataset has a lot of missing data.
+
+I will now clean and tidy the dataset.
+
+```{r}
+ny_noaa = ny_noaa %>% 
+  mutate(date = ymd(date)) %>% 
+  mutate_at(vars(date), funs(year, month, day))
+
+ny_noaa %>% 
+  mode(snow, na.rm = FALSE) 
+```
+
 
