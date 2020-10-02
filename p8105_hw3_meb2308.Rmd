@@ -47,6 +47,24 @@ This table shows the mean hour of the day at which Pink Lady Apples and Coffee I
 
 # Problem 2: Accelerometers 
 
+This problem includes data from an accelerometer dataset including five weeks of data collected on a 63 year-old male with a BMI of 25, who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF).
+
+First, I will load, tidy, and organize the data.
+
+```{r}
+accel_data = 
+  read_csv("./data/accel_data.csv") %>% 
+  pivot_longer(
+    activity.1:activity.1440,
+    names_to = "minute", 
+    names_prefix = "activity.",
+    values_to = "activity_count") %>% 
+  mutate(
+    
+  )
+
+%>%
+```
 
 
 # Problem 3
