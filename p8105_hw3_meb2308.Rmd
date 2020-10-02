@@ -59,13 +59,15 @@ accel_data =
     names_to = "minute", 
     names_prefix = "activity.",
     values_to = "activity_count") %>% 
+  group_by(day) %>% 
   mutate(
-    
-  )
-
-%>%
+    weekend = day,
+    weekend = recode(weekend, "Monday" = "FALSE", "Tuesday" = "FALSE", "Wednesday" = "FALSE", "Thursday" = "FALSE", "Friday" = "FALSE", "Saturday" = "TRUE", "Sunday" = "TRUE"),
+    weekend = as.logical(weekend)
+    )
 ```
 
+The final accelerometer dataset contains information on the day and week of activity collection, whether the data were collected on a weekend or weekday, and the activity count during each minute of the 24 hour days. Overall, the mean activity count per minute during the 5 week observation period was `r round(mean(pull(accel_data, activity_count)),1)`. 
 
 # Problem 3
 

@@ -400,6 +400,28 @@ data(&quot;instacart&quot;)</code></pre>
 </div>
 <div id="problem-2-accelerometers" class="section level1">
 <h1>Problem 2: Accelerometers</h1>
+<p>This problem includes data from an accelerometer dataset including five weeks of data collected on a 63 year-old male with a BMI of 25, who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF).</p>
+<p>First, I will load, tidy, and organize the data.</p>
+<pre class="r"><code>accel_data = 
+  read_csv(&quot;./data/accel_data.csv&quot;) %&gt;% 
+  pivot_longer(
+    activity.1:activity.1440,
+    names_to = &quot;minute&quot;, 
+    names_prefix = &quot;activity.&quot;,
+    values_to = &quot;activity_count&quot;) %&gt;% 
+  group_by(day) %&gt;% 
+  mutate(
+    weekend = day,
+    weekend = recode(weekend, &quot;Monday&quot; = &quot;FALSE&quot;, &quot;Tuesday&quot; = &quot;FALSE&quot;, &quot;Wednesday&quot; = &quot;FALSE&quot;, &quot;Thursday&quot; = &quot;FALSE&quot;, &quot;Friday&quot; = &quot;FALSE&quot;, &quot;Saturday&quot; = &quot;TRUE&quot;, &quot;Sunday&quot; = &quot;TRUE&quot;),
+    weekend = as.logical(weekend)
+    )</code></pre>
+<pre><code>## Parsed with column specification:
+## cols(
+##   .default = col_double(),
+##   day = col_character()
+## )</code></pre>
+<pre><code>## See spec(...) for full column specifications.</code></pre>
+<p>The final accelerometer dataset contains information on the day and week of activity collection, whether the data were collected on a weekend or weekday, and the activity count during each minute of the 24 hour days. Overall, the mean activity count per minute during the 5 week observation period was 267.</p>
 </div>
 <div id="problem-3" class="section level1">
 <h1>Problem 3</h1>
