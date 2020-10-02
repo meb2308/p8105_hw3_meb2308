@@ -47,7 +47,7 @@ This table shows the mean hour of the day at which Pink Lady Apples and Coffee I
 
 # Problem 2: Accelerometers 
 
-This problem includes data from an accelerometer dataset including five weeks of data collected on a 63 year-old male with a BMI of 25, who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF).
+This problem includes data from an accelerometer dataset including five weeks of accelerometer data collected on a 63 year-old male with a BMI of 25 who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF).
 
 First, I will load, tidy, and organize the data.
 
@@ -64,10 +64,26 @@ accel_data =
     weekend = day,
     weekend = recode(weekend, "Monday" = "FALSE", "Tuesday" = "FALSE", "Wednesday" = "FALSE", "Thursday" = "FALSE", "Friday" = "FALSE", "Saturday" = "TRUE", "Sunday" = "TRUE"),
     weekend = as.logical(weekend)
-    )
+  )
+
+head(arrange(accel_data, day_id, week, day, weekend, minute, activity_count))
 ```
 
-The final accelerometer dataset contains information on the day and week of activity collection, whether the data were collected on a weekend or weekday, and the activity count during each minute of the 24 hour days. Overall, the mean activity count per minute during the 5 week observation period was `r round(mean(pull(accel_data, activity_count)),1)`. 
+The final accelerometer dataset contains information on the day and week of activity collection, whether the data were collected on a weekend or weekday, and the activity count during each minute of the 24 hour days. Overall, the mean activity count per minute during the 5 week observation period was `r round(mean(pull(accel_data, activity_count)),1)`. The dataset has `r nrow(accel_data)` rows and `r ncol(accel_data)` columns. 
+
+I'll now create a dataset aggregating activity counts over each day and produce a table showing the totals.
+
+```{r}
+accel_data %>% 
+ group_by (day_id) %>%  
+  mutate(
+    activity_total = sum(activity_count),
+  ) %>% 
+  janitor::tabyl(day_id, activity_total)
+```
+
+
+The trends are..
 
 # Problem 3
 

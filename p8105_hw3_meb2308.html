@@ -400,7 +400,7 @@ data(&quot;instacart&quot;)</code></pre>
 </div>
 <div id="problem-2-accelerometers" class="section level1">
 <h1>Problem 2: Accelerometers</h1>
-<p>This problem includes data from an accelerometer dataset including five weeks of data collected on a 63 year-old male with a BMI of 25, who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF).</p>
+<p>This problem includes data from an accelerometer dataset including five weeks of accelerometer data collected on a 63 year-old male with a BMI of 25 who was admitted to the Advanced Cardiac Care Center of Columbia University Medical Center and diagnosed with congestive heart failure (CHF).</p>
 <p>First, I will load, tidy, and organize the data.</p>
 <pre class="r"><code>accel_data = 
   read_csv(&quot;./data/accel_data.csv&quot;) %&gt;% 
@@ -414,14 +414,177 @@ data(&quot;instacart&quot;)</code></pre>
     weekend = day,
     weekend = recode(weekend, &quot;Monday&quot; = &quot;FALSE&quot;, &quot;Tuesday&quot; = &quot;FALSE&quot;, &quot;Wednesday&quot; = &quot;FALSE&quot;, &quot;Thursday&quot; = &quot;FALSE&quot;, &quot;Friday&quot; = &quot;FALSE&quot;, &quot;Saturday&quot; = &quot;TRUE&quot;, &quot;Sunday&quot; = &quot;TRUE&quot;),
     weekend = as.logical(weekend)
-    )</code></pre>
+  )</code></pre>
 <pre><code>## Parsed with column specification:
 ## cols(
 ##   .default = col_double(),
 ##   day = col_character()
 ## )</code></pre>
 <pre><code>## See spec(...) for full column specifications.</code></pre>
-<p>The final accelerometer dataset contains information on the day and week of activity collection, whether the data were collected on a weekend or weekday, and the activity count during each minute of the 24 hour days. Overall, the mean activity count per minute during the 5 week observation period was 267.</p>
+<pre class="r"><code>head(arrange(accel_data, day_id, week, day, weekend, minute, activity_count))</code></pre>
+<pre><code>## # A tibble: 6 x 6
+## # Groups:   day [1]
+##    week day_id day    minute activity_count weekend
+##   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;           &lt;dbl&gt; &lt;lgl&gt;  
+## 1     1      1 Friday 1                88.4 FALSE  
+## 2     1      1 Friday 10               43.0 FALSE  
+## 3     1      1 Friday 100              38.5 FALSE  
+## 4     1      1 Friday 1000            163   FALSE  
+## 5     1      1 Friday 1001            127   FALSE  
+## 6     1      1 Friday 1002            251   FALSE</code></pre>
+<p>The final accelerometer dataset contains information on the day and week of activity collection, whether the data were collected on a weekend or weekday, and the activity count during each minute of the 24 hour days. Overall, the mean activity count per minute during the 5 week observation period was 267. The dataset has 50400 rows and 6 columns.</p>
+<p>I’ll now create a dataset aggregating activity counts over each day and produce a table showing the totals.</p>
+<pre class="r"><code>accel_data %&gt;% 
+ group_by (day_id) %&gt;%  
+  mutate(
+    activity_total = sum(activity_count),
+  ) %&gt;% 
+  janitor::tabyl(day_id, activity_total)</code></pre>
+<pre><code>##  day_id 138421 1440 154049 260617 295431 307094.244443979 319568
+##       1      0    0      0      0      0                0      0
+##       2      0    0      0      0      0                0      0
+##       3      0    0      0      0      0                0      0
+##       4      0    0      0      0      0                0      0
+##       5      0    0      0      0      0                0      0
+##       6      0    0      0      0      0             1440      0
+##       7      0    0      0      0      0                0      0
+##       8      0    0      0      0      0                0      0
+##       9      0    0      0      0   1440                0      0
+##      10      0    0      0      0      0                0      0
+##      11      0    0      0      0      0                0      0
+##      12      0    0      0      0      0                0      0
+##      13      0    0      0      0      0                0      0
+##      14      0    0      0      0      0                0      0
+##      15      0    0      0      0      0                0      0
+##      16      0    0      0      0      0                0      0
+##      17      0    0      0      0      0                0      0
+##      18      0    0      0      0      0                0      0
+##      19      0    0      0      0      0                0      0
+##      20      0    0      0      0      0                0      0
+##      21      0    0      0      0      0                0      0
+##      22      0    0   1440      0      0                0      0
+##      23      0    0      0      0      0                0      0
+##      24      0 1440      0      0      0                0      0
+##      25      0    0      0   1440      0                0      0
+##      26      0    0      0      0      0                0      0
+##      27      0    0      0      0      0                0   1440
+##      28      0    0      0      0      0                0      0
+##      29      0    0      0      0      0                0      0
+##      30      0    0      0      0      0                0      0
+##      31      0 1440      0      0      0                0      0
+##      32   1440    0      0      0      0                0      0
+##      33      0    0      0      0      0                0      0
+##      34      0    0      0      0      0                0      0
+##      35      0    0      0      0      0                0      0
+##  340115.009595833 340291 355923.644445795 367824 371230 376254 381507 382928
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0   1440      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0             1440      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##              1440      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0   1440
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0   1440      0      0      0
+##                 0      0                0      0      0      0   1440      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0   1440                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##                 0      0                0   1440      0      0      0      0
+##                 0      0                0      0      0      0      0      0
+##  389080 409450 422018 423245 434460 440962 445366 467052 467420 468869 474048
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0   1440      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0   1440
+##       0      0      0   1440      0      0      0      0      0      0      0
+##       0      0      0      0      0   1440      0      0      0      0      0
+##       0      0      0      0      0      0      0      0   1440      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0   1440      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0   1440      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0   1440      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0   1440      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##    1440      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0      0      0      0      0      0
+##       0      0      0      0      0      0   1440      0      0      0      0
+##  480542.620789719 549658 568839 607175 620860 631105 685910 78828.06666767
+##              1440      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0           1440
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0   1440      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0   1440      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0   1440      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0   1440              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0   1440      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0   1440      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0
+##                 0      0      0      0      0      0      0              0</code></pre>
+<p>The trends are..</p>
 </div>
 <div id="problem-3" class="section level1">
 <h1>Problem 3</h1>
