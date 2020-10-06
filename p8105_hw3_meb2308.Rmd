@@ -8,6 +8,8 @@ output: github_document
 ```{r, message = FALSE}
 library(tidyverse)
 library(lubridate)
+library(ggridges)
+library(patchwork)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -105,7 +107,8 @@ accel_data =
     names_prefix = "activity.",
     values_to = "activity_count") %>% 
   group_by(day) %>% 
-  mutate(
+  mutate( 
+    minute = as.numeric(minute),
     weekend = day,
     weekend = recode(weekend, "Monday" = "FALSE", "Tuesday" = "FALSE", "Wednesday" = "FALSE", "Thursday" = "FALSE", "Friday" = "FALSE", "Saturday" = "TRUE", "Sunday" = "TRUE"),
     weekend = as.logical(weekend)
@@ -120,17 +123,33 @@ I'll now create a dataset aggregating activity counts over each day and produce 
 
 ```{r, echo = FALSE}
 accel_data %>% 
- group_by (day_id) %>%  
-  mutate(
-    activity_total = sum(activity_count),
-  ) %>% 
-  janitor::tabyl(day_id, activity_total)
+   mutate(
+    day = factor(day, levels = c("Monday", 
+    "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"))
+    )%>% 
+  group_by (day) %>%
+  summarize(activity_total = sum(activity_count)) %>% 
+  knitr::kable()
 ```
 
+The table shows that total activity is highest on Friday and lowest on Saturday. It seems that the man typically had a higher activity day every other day of the week.
 
-The trends are..
+Now I'll make a plot showing the 24 hour activity time course for each day with activity minute on the x axis and activity count on the y axis.
 
+```{r}
+accel_data %>% 
+  group_by(day) %>%
+  ggplot(aes(x = minute, y = activity_count, color = day)) + 
+    geom_smooth(se = FALSE) +
+    labs(
+      title = "24 hour activity time course by day",
+      x = "Activity minute",
+      y = "Activity count",
+      caption = "Data from the accelerometer dataset"
+  ) 
+```
 
+The plot shows that the man from whom accelerometer data was collected slept during the night (minutes 0-250 and 1375-1500 corresponding to 11pm-4am) and was active during the day. The  biggest spurts of activity were typically late Sunday monring and late Friday night.
 
 # Problem 3
 
@@ -145,7 +164,7 @@ This dataset comes from the National Oceanic and Atmospheric Association (NOAA) 
 
 Prior to cleaning, the dataset had `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. Since each station collects only a subset of the variables described, the dataset has a lot of missing data.
 
-I will now clean and tidy the dataset.
+I will now clean and tidy the dataset and switch the units to reasonable ones.
 
 ```{r}
 ny_noaa = ny_noaa %>% 
