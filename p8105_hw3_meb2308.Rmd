@@ -164,12 +164,24 @@ This dataset comes from the National Oceanic and Atmospheric Association (NOAA) 
 
 Prior to cleaning, the dataset had `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. Since each station collects only a subset of the variables described, the dataset has a lot of missing data.
 
-I will now clean and tidy the dataset and switch the units to reasonable ones.
+I will now clean and tidy the dataset. I converted snowfall, snow depth, and precipitation to inches.
 
 ```{r}
 ny_noaa = ny_noaa %>% 
   mutate(date = ymd(date)) %>% 
-  mutate_at(vars(date), funs(year, month, day))
+  mutate_at(vars(date), funs(year, month, day)) %>% 
+  mutate(
+    snow_in = (snow * 0.0393701),
+    snwd_in = (snwd * 0.0393701),
+    prcp_in = (snwd * 0.393701)
+  )
 ```
+
+```{r}
+ny_noaa %>% 
+  summarize(mode = mode(snow, na.rm = TRUE))
+```
+
+The most commonly observed value for snowfall is 0, because it doesn't snow on many days in New York. 
 
 
