@@ -173,15 +173,61 @@ ny_noaa = ny_noaa %>%
   mutate(
     snow_in = (snow * 0.0393701),
     snwd_in = (snwd * 0.0393701),
-    prcp_in = (snwd * 0.393701)
+    prcp_in = (snwd * 0.393701),
+    tmax = as.numeric(tmax),
+    tmin = as.numeric(tmin),
+    tmax = (tmax / 10),
+    tmin = (tmin / 10)
   )
 ```
 
 ```{r}
 ny_noaa %>% 
-  summarize(mode = mode(snow, na.rm = TRUE))
+  summarize(median = median(snow_in, na.rm = TRUE))
 ```
 
 The most commonly observed value for snowfall is 0, because it doesn't snow on many days in New York. 
 
+Here is a two-panel plot showing the average max temperature in January and in July in each station across years. 
 
+```{r}
+ny_noaa %>% 
+  select(month, year, tmax) %>% 
+  group_by(month, year) %>% 
+  filter(month %in% c(1, 7)) %>% 
+  drop_na() %>%
+  summarize(mean_tmax = mean(tmax)) %>%
+  ggplot(aes(x = year, y = mean_tmax, color = month)) +
+  geom_point() +
+  labs(
+    title = "Average max temperature in January and July at NY stations",
+    x = "Year",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package"
+  ) 
+```
+
+The plot shows that the max temperature is higher in July than January across all years and there is variation from year to year. Adding the geom_smooth function shows that max temperature has increased since 1980 in January and July. 
+
+I will make a two-panel plot showing the maximum vs minimum temperature for the full dataset. 
+
+```{r}
+ny_noaa %>% 
+  select(year, tmax, tmin) %>% 
+  drop_na() %>% 
+  group_by(year, tmax, tmin) %>% 
+  ggplot(aes(x = year, y = tmax)) +
+  geom_violin()
+
+
+  
+  labs(
+    title = "Max and min temperature by year",
+    x = "Year",
+    y = "Maxiumum daily temperature (C)",
+    caption = "Data from the rnoaa package"
+  ) 
+%>% 
+  
+```
+Finally, I'll plot the distribution of snowfall above 0 mm and below 100mm seperately by year.  
