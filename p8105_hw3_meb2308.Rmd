@@ -195,8 +195,8 @@ ny_noaa %>%
   group_by(month, year) %>% 
   filter(month %in% c(1, 7)) %>% 
   drop_na() %>%
-  summarize(mean_tmax = mean(tmax)) %>%
-  ggplot(aes(x = year, y = mean_tmax, color = month)) +
+  summarize(mean_tmax = mean(tmax)) %>% 
+  ggplot(aes(x = year, y = mean_tmax)) +
   geom_point() +
   geom_smooth() +
   labs(
@@ -204,10 +204,12 @@ ny_noaa %>%
     x = "Year",
     y = "Maxiumum daily temperature (C)",
     caption = "Data from the rnoaa package"
-  ) 
+  ) +
+  facet_grid(~month, scales = "free_y")
+  
 ```
 
-The plot shows that the max temperature is higher in July than January across all years and there is variation from year to year. Adding the geom_smooth function shows that max temperature has increased since 1980 in January and July. There were no observable extreme outliers. 
+The plot shows that the max temperature is higher in July than January across all years and there is variation from year to year. Adding the geom_smooth function shows that max temperature has increased since 1980 in January. There were a few observable outliers. For instance, the low of -5 degrees C in Januart of 1994.
 
 I will make a two-panel plot showing the maximum vs minimum temperature for the full dataset. 
 
@@ -224,8 +226,8 @@ ny_noaa %>%
     caption = "Data from the rnoaa package"
   ) 
 ```
-Finally, I'll plot the distribution of snowfall above 0 mm and below 100mm separately by year.  
 
+Finally, I'll plot the distribution of snowfall above 0 mm and below 100mm separately by year.  
 ```{r}
 ny_noaa %>% 
   select(year, snow) %>% 
