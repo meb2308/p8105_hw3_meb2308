@@ -180,7 +180,7 @@ ny_noaa = ny_noaa %>%
 
 ```{r}
 ny_noaa %>% 
-  summarize(median = median(snow_in, na.rm = TRUE))
+  summarize(median = median(snow, na.rm = TRUE))
 ```
 
 The most commonly observed value for snowfall is 0, because it doesn't snow on many days in New York. 
@@ -226,12 +226,11 @@ temp_plot =
 
 snow_plot = 
   ny_noaa %>% 
-  group_by(year, snow) %>% 
   filter(snow > 0 & snow < 100) %>%
   select(year, snow) %>% 
   drop_na() %>% 
   ggplot(aes(x = year, y = snow)) +
-  geom_violin()+
+  geom_boxplot()
   labs(
     title = "Snowfall above 0 and below 100mm by year",
     x = "Year",
