@@ -1,7 +1,7 @@
 ---
 title: "P8105 Homework 3 Solutions"
 author: Meghan Bellerose
-date: October 1, 2020
+date: October 10, 2020
 output: github_document
 ---
 
@@ -159,22 +159,23 @@ library(p8105.datasets)
 data("ny_noaa")
 ```
 
-This dataset comes from the National Oceanic and Atmospheric Association (NOAA) National Climatic Data Center. It includes information on all New York State weather stations from January 1, 1981 to December 21, 2010, including the weather station id (id), date of observation, precipitation in tenths of mm (prcp), snowfall in mm (snow), snow depth in mm (snwd), maximum and minimum temperature in degrees C (tmax) (tmin). 
+This dataset comes from the National Oceanic and Atmospheric Association (NOAA) National Climatic Data Center. It includes information on all New York State weather stations from January 1, 1981 to December 21, 2010, including the weather station id, date of observation, precipitation in tenths of mm (prcp), snowfall in mm (snow), snow depth in mm (snwd), maximum and minimum temperature in degrees C (tmax) (tmin). 
 
 Prior to cleaning, the dataset had `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. Since each station collects only a subset of the variables described, the dataset has a lot of missing data.
 
-I will now clean and tidy the dataset. I converted tenths of degrees celcius to degrees celcius. 
+I will now clean and tidy the dataset. I converted tenths of degrees celcius to degrees celcius and tenths of mm precipitation to mm.
 
 ```{r}
 ny_noaa = ny_noaa %>% 
-  mutate(date = ymd(date)) %>% 
+  mutate(
+    date = ymd(date))%>% 
   mutate_at(vars(date), funs(year, month, day)) %>%
   mutate(
     tmax = as.numeric(tmax),
     tmin = as.numeric(tmin),
     prcp = (prcp / 10),
     tmax = (tmax / 10),
-    tmin = (tmin / 10)
+    tmin = (tmin / 10),
   )
 ```
 
@@ -228,9 +229,10 @@ snow_plot =
   ny_noaa %>% 
   filter(snow > 0 & snow < 100) %>%
   select(year, snow) %>% 
+  group_by (year) %>% 
   drop_na() %>% 
   ggplot(aes(x = year, y = snow)) +
-  geom_boxplot()
+  geom_boxplot() +
   labs(
     title = "Snowfall above 0 and below 100mm by year",
     x = "Year",
