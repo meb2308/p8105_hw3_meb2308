@@ -167,21 +167,26 @@ I will now clean and tidy the dataset. I converted tenths of degrees celcius to 
 
 ```{r}
 ny_noaa = ny_noaa %>% 
+  janitor::clean_names() %>% 
+  separate(date, into = c("year", "month", "day")) %>% 
   mutate(
-    date = ymd(date))%>% 
-  mutate_at(vars(date), funs(year, month, day)) %>%
-  mutate(
+    month = month.abb[as.factor(month)],
+    year = as.factor(year),
+    day = as.factor(day),
     tmax = as.numeric(tmax),
     tmin = as.numeric(tmin),
     prcp = (prcp / 10),
     tmax = (tmax / 10),
-    tmin = (tmin / 10),
+    tmin = (tmin / 10)
   )
 ```
 
 ```{r}
 ny_noaa %>% 
-  summarize(median = median(snow, na.rm = TRUE))
+  select(snow) %>% 
+  ggplot(aes(x = snow, na.rm = FALSE)) + 
+  geom_histogram()
+
 ```
 
 The most commonly observed value for snowfall is 0, because it doesn't snow on many days in New York. 
@@ -192,19 +197,19 @@ Here is a two-panel plot showing the average max temperature in January and in J
 ny_noaa %>% 
   select(month, year, tmax) %>% 
   group_by(month, year) %>% 
-  filter(month %in% c(1, 7)) %>% 
+  filter(month %in% c("Jan", "Jul")) %>% 
   drop_na() %>%
   summarize(mean_tmax = mean(tmax)) %>% 
   ggplot(aes(x = year, y = mean_tmax)) +
   geom_point() +
-  geom_smooth() +
   labs(
     title = "Average max temperature in January and July at NY stations",
     x = "Year",
     y = "Maxiumum daily temperature (C)",
     caption = "Data from the rnoaa package"
   ) +
-  facet_grid(~month, scales = "free_y")
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  facet_grid(~month)
   
 ```
 
@@ -227,21 +232,22 @@ temp_plot =
 
 snow_plot = 
   ny_noaa %>% 
+  drop_na(snow) %>% 
   filter(snow > 0 & snow < 100) %>%
-  select(year, snow) %>% 
   group_by (year) %>% 
-  drop_na() %>% 
-  ggplot(aes(x = year, y = snow)) +
-  geom_boxplot() +
+  ggplot(aes(x = year, y = snow, fill = year)) +
+  geom_violin() +
   labs(
     title = "Snowfall above 0 and below 100mm by year",
     x = "Year",
     y = "Snowfall (mm)",
     caption = "Data from the rnoaa package"
   ) +
-  theme(legend.position = "right")
+  theme(axis.text.x = element_text(angle = 90), legend.position = "none")
 
 (temp_plot + snow_plot)
+
+ggsave("temp_snow_plot.pdf", (temp_plot + snow_plot), width = 10, height = 5)
 
 ```
 
